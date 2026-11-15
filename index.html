@@ -22,9 +22,9 @@ button{font:700 12px system-ui, sans-serif;cursor:pointer;color:#edf8ff;backgrou
 #mKeys{position:absolute;right:12px;bottom:214px;display:none;flex-direction:column;gap:8px;pointer-events:auto}#mKeys button{padding:8px 10px;font-size:11px}
 #altButtons{position:absolute;right:18px;bottom:102px;display:none;flex-direction:column;gap:12px;pointer-events:auto}#altButtons button{width:68px;height:68px;border-radius:50%;padding:0;font-size:11px;display:grid;place-items:center;line-height:1.15}
 #helpToggleMini{display:none}
-#settings{position:absolute;right:17px;top:116px;padding:14px;width:190px;pointer-events:auto}#settings h3{font-size:11px;letter-spacing:.1em;margin:0 0 9px}#settings label{display:block;font-size:10px;color:#b5d4e5;margin:9px 0 4px}#settings input[type=range]{width:100%;accent-color:#60c6f0}#settings select{width:100%;background:#13283c;color:white;border:1px solid #6b8ba0;border-radius:7px;padding:5px}
+#settings{position:absolute;right:17px;top:116px;padding:14px;width:220px;pointer-events:auto}#settings h3{font-size:11px;letter-spacing:.1em;margin:0 0 9px}#settings h4{font-size:10px;letter-spacing:.08em;margin:10px 0 6px;color:#dce7f2}#settings label{display:block;font-size:10px;color:#b5d4e5;margin:9px 0 4px}#settings input[type=range]{width:100%;accent-color:#60c6f0}#settings select{width:100%;background:#13283c;color:white;border:1px solid #6b8ba0;border-radius:7px;padding:5px}#settings .section{border-top:1px solid rgba(180,205,225,.18);padding-top:10px;margin-top:10px}#settings .helpLine{font-size:10px;line-height:1.7;color:#d2dce7}
 #err{position:fixed;left:15px;right:15px;bottom:15px;background:#882d32ed;border-radius:12px;padding:14px;display:none;z-index:9;white-space:pre-wrap}
-.hidden{display:none!important}@media(max-width:700px){#top{top:8px;left:8px;right:8px}#brand{padding:10px 11px}#brand b{font-size:11px}#brand small{font-size:8px}#meters{min-width:112px;padding:8px 10px;font-size:10px}#spd{font-size:21px}#help{top:76px;left:8px;width:151px;padding:10px;font-size:9px;max-height:42vh;overflow:auto}#help b{font-size:11px}#settings{top:76px;right:8px;width:137px;padding:10px}#bottom{bottom:8px;gap:5px;flex-wrap:wrap;justify-content:center;width:min(96vw,680px)}#bottom button{padding:9px 8px;font-size:10px}#mobile{display:block}#mKeys{display:flex;right:10px;bottom:270px}#altButtons{display:flex;right:18px;bottom:112px}#helpToggleMini{display:inline-flex}#badge,#foot{display:none}}
+.hidden{display:none!important}@media(max-width:700px){#top{top:8px;left:8px;right:8px}#brand{padding:10px 11px}#brand b{font-size:11px}#brand small{font-size:8px}#meters{min-width:112px;padding:8px 10px;font-size:10px}#spd{font-size:21px}#settings{top:76px;right:8px;width:170px;padding:10px;max-height:55vh;overflow:auto}#bottom{bottom:8px;gap:5px;flex-wrap:wrap;justify-content:center;width:min(96vw,680px)}#bottom button{padding:9px 8px;font-size:10px}#mobile{display:block}#mKeys{display:flex;right:10px;bottom:270px}#altButtons{display:flex;right:18px;bottom:112px}#helpToggleMini{display:none}#badge,#foot{display:none}}
 /* BLACK / WHITE FLIGHT LAB theme */
 :root{color:#f4f7fb}html,body{background:#141a22}
 .card{background:linear-gradient(125deg,rgba(10,13,19,.89),rgba(28,33,40,.79));border-color:rgba(231,241,252,.31);box-shadow:0 14px 42px #0008}
@@ -36,14 +36,14 @@ button.primary{background:linear-gradient(135deg,#f0f3f9,#9faebc);color:#101924;
 </style>
 </head><body>
 <div id="stage"></div><div id="ui">
- <div id="top"><div class="card" id="brand"><b>TRANSFORMING WORLD</b><small>CARCONCEPT / FLIGHT LAB 13 · FULL OPEN ROADSTER</small></div><div class="card" id="meters"><div><span id="spd">0</span> km/h</div><div id="mode">LAND MODE</div><div id="alt">高度 0.0 m</div><div id="roofState">ROOF: CLOSED</div></div></div></div>
- <div class="card" id="help"><b>操作説明（切替可能）</b><div>左ホイール　前進 / 後退 / 旋回</div><div>画面ドラッグ　視点回転</div><div>上昇 / 下降　右側の丸ボタン</div><div>右下ホイールは廃止</div><div>F　陸 ⇄ 飛行に変形</div><div><b>T　オープンカー / ルーフ閉</b></div><div>飛行時：格納式ジェット＋伸長リアウィング</div><div>C　カメラ切替</div><div>Space　ブレーキ</div><div>R　初期位置 / H　HUD</div><div>マウスホイール / ピンチ相当　拡大縮小</div></div>
- <div class="card" id="settings"><h3>CAMERA / GRAPHICS</h3><label>マウス視点感度</label><input id="sensitivity" type="range" min="1" max="10" value="4" /><label>画質</label><select id="quality"><option value="auto">自動</option><option value="high">高</option><option value="low">軽量</option></select><label><input id="autoCam" type="checkbox" checked /> 視点をゆっくり中央へ戻す</label></div>
- <div id="bottom"><button class="primary" id="transform" disabled>✦ 変形 F</button><button id="roof" disabled>☀ オープン T</button><button id="camera">◉ 視点 C</button><button id="helpToggle">説明 OFF</button><button id="reset">↺ リセット R</button><button id="hud">HUD H</button></div>
+ <div id="top"><div class="card" id="brand"><b>TRANSFORMING WORLD</b><small>CARCONCEPT / FLIGHT LAB 14 · CLEAN OPEN UI</small></div><div class="card" id="meters"><div><span id="spd">0</span> km/h</div><div id="mode">LAND MODE</div><div id="alt">高度 0.0 m</div><div id="roofState">ROOF: CLOSED</div></div></div></div>
+ <div class="card hidden" id="help"></div>
+ <div class="card hidden" id="settings"><h3>SETTINGS</h3><div class="section"><h4>CAMERA / GRAPHICS</h4><label>マウス視点感度</label><input id="sensitivity" type="range" min="1" max="10" value="4" /><label>画質</label><select id="quality"><option value="auto">自動</option><option value="high">高</option><option value="low">軽量</option></select><label><input id="autoCam" type="checkbox" checked /> 視点をゆっくり中央へ戻す</label></div><div class="section"><h4>操作説明</h4><div class="helpLine">左ホイール　前進 / 後退 / 旋回</div><div class="helpLine">画面ドラッグ　視点回転</div><div class="helpLine">上昇 / 下降　右側の丸ボタン</div><div class="helpLine">F　陸 ⇄ 飛行に変形</div><div class="helpLine">T　オープンカー / ルーフ閉</div><div class="helpLine">飛行時：横翼＋ジェット＋伸長リアウィング</div><div class="helpLine">C　カメラ切替</div><div class="helpLine">Space　ブレーキ</div><div class="helpLine">R　初期位置 / H　HUD</div><div class="helpLine">マウスホイール / ピンチ相当　拡大縮小</div></div></div>
+ <div id="bottom"><button class="primary" id="transform" disabled>✦ 変形 F</button><button id="roof" disabled>☀ オープン T</button><button id="camera">◉ 視点 C</button><button id="settingsToggle">⚙ 設定</button><button id="reset">↺ リセット R</button><button id="hud">HUD H</button></div>
  <div id="mobile"><div class="stick" id="move" aria-label="drive"></div></div>
- <div id="mKeys"><button class="primary" id="mobileTransform">飛行変形</button><button id="mobileRoof">ルーフ開閉 T</button><button id="brake">ブレーキ</button><button id="helpToggleMini">説明 OFF</button></div>
+ <div id="mKeys"><button class="primary" id="mobileTransform">飛行変形</button><button id="mobileRoof">ルーフ開閉 T</button><button id="brake">ブレーキ</button><button id="mobileSettings">設定</button></div>
  <div id="altButtons"><button id="up">上昇<br>E</button><button id="down">下降<br>Q</button></div>
- <div id="notice"></div><div class="card" id="loading"><b>精密車両データを読み込み中...</b><p>横翼を飛行時に再展開し、タイヤを水平に収納、オープンルーフの動きを滑らかにします。</p></div>
+ <div id="notice"></div><div class="card" id="loading"><b>精密車両データを読み込み中...</b><p>フルオープン化を調整し、設定パネルへ説明と感度をまとめています。</p></div>
  <div id="badge">MODEL: CarConcept © Eric Chadwick / Darmstadt Graphics Group · CC BY 4.0</div><div id="foot">車両単体の変形・飛行テスト版（地形と街並みは未統合）</div>
  </div><div id="err"></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -337,7 +337,11 @@ function setupConvertible(){
   'BodyRearwindow','BodyWindowsRearSides','BodyPillars',
   'InteriorPillar','InteriorCage',
   'BodyDoorLWindow','BodyDoorRWindow',
-  'BodyDoorLWindowGasket','BodyDoorRWindowGasket'
+  'BodyDoorLWindowGasket','BodyDoorRWindowGasket',
+  // Try to remove leftover open-top frame pieces if the source model exposes them.
+  'BodyWindshield','BodyWindshieldFrame','BodyWindshieldGasket',
+  'BodyFrontGlass','BodyFrontGlassFrame','BodyFrontGlassTrim',
+  'BodyRoofFrame','BodyUpperFrame'
  ];
  roofParts=[];
  for(const name of removable){
@@ -367,8 +371,8 @@ function applyRoofAnimation(){
  if(roofCarrier){
   // Glide to the rear, lift over the rear deck, then visually tuck away.
   // Avoid a roof slab remaining on the rear body once fully open.
-  roofCarrier.position.set(0,.14*u,-1.76*u);
-  roofCarrier.rotation.x=-.14*u;
+  roofCarrier.position.set(0,.10*u,-1.92*u);
+  roofCarrier.rotation.x=-.10*u;
   const disappear=smooth(THREE.MathUtils.clamp((u-.58)/.42,0,1));
   roofCarrier.visible=disappear<.998;
   for(const entry of roofCarrier.userData.fade){
@@ -467,22 +471,22 @@ function setMode(){
  }
  beginModeTransition();
 }
-function reset(){flight=0;fromFlight=0;toFlight=0;transition=false;phase=1;pendingFlight=false;roofTarget=0;roofOpen=0;applyRoofAnimation();updateRoofUI();updateWheelRotation(0);moveSpeed=0;verticalVelocity=0;carYaw=0;rig.position.set(0,.05,0);rig.rotation.set(0,0,0);orbitYaw=-.36;orbitPitch=.22;$('mode').textContent=modes[flight];toast('初期位置へ戻りました');}
-let firstPerson=false,hudVisible=true,helpVisible=true,orbitYaw=-.36,orbitPitch=.22,camDistance=12,sensitivity=4,autoCamera=true;
+function reset(){flight=0;fromFlight=0;toFlight=0;transition=false;phase=1;pendingFlight=false;roofTarget=0;roofOpen=0;applyRoofAnimation();updateRoofUI();updateWheelRotation(0);moveSpeed=0;verticalVelocity=0;carYaw=0;rig.position.set(0,.05,0);rig.rotation.set(0,0,0);orbitYaw=-.36;orbitPitch=.22;settingsVisible=false;applySettingsVisibility();$('mode').textContent=modes[flight];toast('初期位置へ戻りました');}
+let firstPerson=false,hudVisible=true,settingsVisible=false,orbitYaw=-.36,orbitPitch=.22,camDistance=12,sensitivity=4,autoCamera=true;
 function toggleCamera(){firstPerson=!firstPerson;toast(firstPerson?'車内視点':'追従視点')}
-function applyHelpVisibility(){
- $('help').classList.toggle('hidden',!hudVisible||!helpVisible);
- const label=helpVisible?'説明 OFF':'説明 ON';
- if($('helpToggle'))$('helpToggle').textContent=label;
- if($('helpToggleMini'))$('helpToggleMini').textContent=label;
+function applySettingsVisibility(){
+ $('settings').classList.toggle('hidden',!hudVisible||!settingsVisible);
+ const label=settingsVisible?'設定 OFF':'⚙ 設定';
+ if($('settingsToggle'))$('settingsToggle').textContent=label;
+ if($('mobileSettings'))$('mobileSettings').textContent=settingsVisible?'設定 OFF':'設定';
 }
-function toggleHelp(){helpVisible=!helpVisible;applyHelpVisibility();}
-function toggleHud(){hudVisible=!hudVisible;['top','settings','bottom','foot','badge','mobile','mKeys','altButtons'].forEach(id=>$(id).classList.toggle('hidden',!hudVisible));applyHelpVisibility();}
-$('transform').onclick=$('mobileTransform').onclick=setMode;$('roof').onclick=$('mobileRoof').onclick=toggleRoof;$('camera').onclick=toggleCamera;$('reset').onclick=reset;$('hud').onclick=toggleHud;$('helpToggle').onclick=toggleHelp;$('helpToggleMini').onclick=toggleHelp;
+function toggleSettings(){settingsVisible=!settingsVisible;applySettingsVisibility();}
+function toggleHud(){hudVisible=!hudVisible;['top','bottom','foot','badge','mobile','mKeys','altButtons'].forEach(id=>$(id).classList.toggle('hidden',!hudVisible));applySettingsVisibility();}
+$('transform').onclick=$('mobileTransform').onclick=setMode;$('roof').onclick=$('mobileRoof').onclick=toggleRoof;$('camera').onclick=toggleCamera;$('reset').onclick=reset;$('hud').onclick=toggleHud;$('settingsToggle').onclick=toggleSettings;$('mobileSettings').onclick=toggleSettings;
 $('sensitivity').oninput=e=>{sensitivity=+e.target.value};$('autoCam').onchange=e=>{autoCamera=e.target.checked};
 function setQuality(){const q=$('quality').value;const res=q==='high'?1.8:q==='low'?1:Math.min(devicePixelRatio,1.5);renderer.setPixelRatio(res);light.shadow.mapSize.set(q==='low'?512:1024,q==='low'?512:1024);light.shadow.map?.dispose();light.shadow.map=null;}
 $('quality').onchange=setQuality;
-addEventListener('keydown',e=>{keys[e.code]=true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.repeat)return;if(e.code==='KeyF')setMode();if(e.code==='KeyT')toggleRoof();if(e.code==='KeyC')toggleCamera();if(e.code==='KeyR')reset();if(e.code==='KeyH')toggleHud();if(e.code==='Slash')toggleHelp();});
+addEventListener('keydown',e=>{keys[e.code]=true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.repeat)return;if(e.code==='KeyF')setMode();if(e.code==='KeyT')toggleRoof();if(e.code==='KeyC')toggleCamera();if(e.code==='KeyR')reset();if(e.code==='KeyH')toggleHud();if(e.code==='Slash')toggleSettings();});
 addEventListener('keyup',e=>{keys[e.code]=false});addEventListener('blur',()=>{Object.keys(keys).forEach(k=>keys[k]=false)});
 for(const [id,key] of [['up','KeyE'],['down','KeyQ'],['brake','Space']]){const el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();el.setPointerCapture(e.pointerId);keys[key]=true});for(const ev of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(ev,()=>keys[key]=false);}
 let dragging=false,mx=0,my=0,joySteer=0,joyThrottle=0;
@@ -494,7 +498,7 @@ for(const ev of ['pointerup','pointercancel','lostpointercapture','pointerleave'
 canvas.addEventListener('wheel',e=>{e.preventDefault();camDistance=THREE.MathUtils.clamp(camDistance+e.deltaY*.014,6,25)},{passive:false});
 function makeStick(id,cb){const el=$(id);let active=false,sx=0,sy=0;el.addEventListener('pointerdown',e=>{e.preventDefault();active=true;sx=e.clientX;sy=e.clientY;el.setPointerCapture(e.pointerId)});el.addEventListener('pointermove',e=>{if(active)cb(THREE.MathUtils.clamp((e.clientX-sx)/42,-1,1),THREE.MathUtils.clamp((e.clientY-sy)/42,-1,1))});for(const ev of ['pointerup','pointercancel','lostpointercapture'])el.addEventListener(ev,()=>{active=false;cb(0,0)})}
 makeStick('move',(x,y)=>{joySteer=-x;joyThrottle=-y});
-applyHelpVisibility();
+applySettingsVisibility();
 
 const cTarget=new THREE.Vector3(),cPos=new THREE.Vector3(),forward=new THREE.Vector3();
 const frameClock=new THREE.Clock();let elapsed=0,frameCount=0,qualityFPS=60,statsTime=0;
