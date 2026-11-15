@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover" />
-<title>TRANSFORMING WORLD | CarConcept Flight Lab v9</title>
+<title>TRANSFORMING WORLD | CarConcept Flight Lab v10</title>
 <style>
 :root{font-family:Inter,system-ui,-apple-system,"Yu Gothic",Meiryo,sans-serif;color:#f1f8ff;color-scheme:dark}*{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101d2b}body{user-select:none}canvas{display:block}#stage{position:fixed;inset:0}#ui{position:fixed;inset:0;pointer-events:none}
@@ -36,14 +36,14 @@ button.primary{background:linear-gradient(135deg,#f0f3f9,#9faebc);color:#101924;
 </style>
 </head><body>
 <div id="stage"></div><div id="ui">
- <div id="top"><div class="card" id="brand"><b>TRANSFORMING WORLD</b><small>CARCONCEPT / FLIGHT LAB 09 · WING EXTEND / WHEEL ROTATE</small></div><div class="card" id="meters"><div><span id="spd">0</span> km/h</div><div id="mode">LAND MODE</div><div id="alt">高度 0.0 m</div><div id="roofState">ROOF: CLOSED</div></div></div></div>
- <div class="card" id="help"><b>操作説明（切替可能）</b><div>左ホイール　前進 / 後退 / 旋回</div><div>画面ドラッグ　視点回転</div><div>上昇 / 下降　右側の丸ボタン</div><div>右下ホイールは廃止</div><div>F　陸 ⇄ 飛行に変形</div><div><b>T　オープンカー / ルーフ閉</b></div><div>飛行時：格納式ジェット＋斜め後方スポイラー</div><div>C　カメラ切替</div><div>Space　ブレーキ</div><div>R　初期位置 / H　HUD</div><div>マウスホイール / ピンチ相当　拡大縮小</div></div>
+ <div id="top"><div class="card" id="brand"><b>TRANSFORMING WORLD</b><small>CARCONCEPT / FLIGHT LAB 10 · REAR WING / WHEEL DOWN</small></div><div class="card" id="meters"><div><span id="spd">0</span> km/h</div><div id="mode">LAND MODE</div><div id="alt">高度 0.0 m</div><div id="roofState">ROOF: CLOSED</div></div></div></div>
+ <div class="card" id="help"><b>操作説明（切替可能）</b><div>左ホイール　前進 / 後退 / 旋回</div><div>画面ドラッグ　視点回転</div><div>上昇 / 下降　右側の丸ボタン</div><div>右下ホイールは廃止</div><div>F　陸 ⇄ 飛行に変形</div><div><b>T　オープンカー / ルーフ閉</b></div><div>飛行時：格納式ジェット＋伸長リアウィング</div><div>C　カメラ切替</div><div>Space　ブレーキ</div><div>R　初期位置 / H　HUD</div><div>マウスホイール / ピンチ相当　拡大縮小</div></div>
  <div class="card" id="settings"><h3>CAMERA / GRAPHICS</h3><label>マウス視点感度</label><input id="sensitivity" type="range" min="1" max="10" value="4" /><label>画質</label><select id="quality"><option value="auto">自動</option><option value="high">高</option><option value="low">軽量</option></select><label><input id="autoCam" type="checkbox" checked /> 視点をゆっくり中央へ戻す</label></div>
  <div id="bottom"><button class="primary" id="transform" disabled>✦ 変形 F</button><button id="roof" disabled>☀ オープン T</button><button id="camera">◉ 視点 C</button><button id="helpToggle">説明 OFF</button><button id="reset">↺ リセット R</button><button id="hud">HUD H</button></div>
  <div id="mobile"><div class="stick" id="move" aria-label="drive"></div></div>
  <div id="mKeys"><button class="primary" id="mobileTransform">飛行変形</button><button id="mobileRoof">ルーフ開閉 T</button><button id="brake">ブレーキ</button><button id="helpToggleMini">説明 OFF</button></div>
  <div id="altButtons"><button id="up">上昇<br>E</button><button id="down">下降<br>Q</button></div>
- <div id="notice"></div><div class="card" id="loading"><b>精密車両データを読み込み中...</b><p>車体を維持し、後方スライドルーフ・可動タイヤ・伸長翼を追加します。</p></div>
+ <div id="notice"></div><div class="card" id="loading"><b>精密車両データを読み込み中...</b><p>車体を維持し、後方スライドルーフ・下向き回転タイヤ・伸長リアウィングを追加します。</p></div>
  <div id="badge">MODEL: CarConcept © Eric Chadwick / Darmstadt Graphics Group · CC BY 4.0</div><div id="foot">車両単体の変形・飛行テスト版（地形と街並みは未統合）</div>
  </div><div id="err"></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -153,7 +153,7 @@ function createRearSpoiler(){
  const endCapR=endCapL.clone();endCapR.position.x=-.99;wingPivot.add(endCapR);
  const lowerFlap=new THREE.Mesh(new THREE.BoxGeometry(1.72,.036,.12),jetMat);
  lowerFlap.position.set(0,-.048,.13);wingPivot.add(lowerFlap);
- spoilerSets.push({root:spoilerRoot,wingPivot,mainWing,lowerFlap,posts});
+ spoilerSets.push({root:spoilerRoot,wingPivot,mainWing,lowerFlap,posts,topStripe,endCapL,endCapR});
 }
 createRearSpoiler();
 
@@ -288,7 +288,7 @@ function setupWheelPivots(){
 }
 function updateWheelRotation(airFraction){
  // 90 degrees in aircraft mode; original exact wheel orientation in road mode.
- wheelDelta.setFromAxisAngle(wheelTurnAxis,airFraction*Math.PI/2);
+ wheelDelta.setFromAxisAngle(wheelTurnAxis,-airFraction*Math.PI/2);
  for(const t of wheelRotators)t.wheel.quaternion.copy(t.base).premultiply(wheelDelta);
 }
 function setupConvertible(){
@@ -445,29 +445,35 @@ function animate(){
   if(!transition&&flight<.01)$('mode').textContent=roofOpen>.92?'LAND · OPEN TOP':'LAND MODE';
   updateRoofUI();
   const wings=smooth((flight-.03)/.97);
-  // Compact fixed wings in LAND mode; extend outward into aircraft wings in FLIGHT.
+  // Side elements stay compact. The rear wing is the part that extends in flight.
   for(const part of wingSets){
    const deploy=smooth(wings);
    part.hinge.visible=true;
    part.hinge.scale.setScalar(1);
-   part.hinge.rotation.z=(part.hinge.position.x>0?1:-1)*(.03*(1-deploy));
-   part.hinge.rotation.y=(part.hinge.position.x>0?1:-1)*(.12*(1-deploy));
-   part.mirror.scale.x=(part.hinge.position.x>0?1:-1)*(.20+.80*deploy);
+   part.hinge.rotation.z=(part.hinge.position.x>0?1:-1)*.03;
+   part.hinge.rotation.y=(part.hinge.position.x>0?1:-1)*.12;
+   part.mirror.scale.x=(part.hinge.position.x>0?1:-1)*.20;
    part.nav.visible=deploy>.10;
    part.jet.visible=deploy>.12;
   }
   updateWheelRotation(wings);
   thrusters.forEach((t,i)=>{t.visible=wings>.03;t.scale.setScalar(.78+.22*wings+Math.sin(elapsed*34+i)*.025)});
-  const aeroDeploy=THREE.MathUtils.clamp(Math.abs(moveSpeed)/38,0,1)*0.16;
+  const aeroDeploy=THREE.MathUtils.clamp(Math.abs(moveSpeed)/38,0,1)*0.12;
   const spoilerDeploy=Math.max(wings,aeroDeploy);
   for(const s of spoilerSets){
-   s.root.visible=spoilerDeploy>.01;
-   // The wing travels diagonally up and BACK, while both rails keep touching the deck.
+   s.root.visible=true;
+   // Rear wing stays mounted in LAND mode, then rises, slides back, and widens in FLIGHT.
    const tipY=.105+.61*spoilerDeploy;
    const tipZ=-.095-.50*spoilerDeploy;
    s.wingPivot.position.set(0,tipY,tipZ);
-   s.wingPivot.rotation.x=-.018; // wing chord stays nearly horizontal
+   s.wingPivot.rotation.x=-.018;
+   const spanScale=1+.85*spoilerDeploy;
+   s.mainWing.scale.x=spanScale;
+   s.topStripe.scale.x=1+.78*spoilerDeploy;
+   s.lowerFlap.scale.x=1+.72*spoilerDeploy;
    s.lowerFlap.rotation.x=.035+.055*spoilerDeploy;
+   s.endCapL.position.x=.99+.82*spoilerDeploy;
+   s.endCapR.position.x=-.99-.82*spoilerDeploy;
    for(const support of s.posts){
     const x=support.side*.37;
     const anchor=new THREE.Vector3(x,.012,0);
