@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover" />
-<title>TRANSFORMING WORLD | CarConcept Flight Lab v10</title>
+<title>TRANSFORMING WORLD | CarConcept Flight Lab v11</title>
 <style>
 :root{font-family:Inter,system-ui,-apple-system,"Yu Gothic",Meiryo,sans-serif;color:#f1f8ff;color-scheme:dark}*{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101d2b}body{user-select:none}canvas{display:block}#stage{position:fixed;inset:0}#ui{position:fixed;inset:0;pointer-events:none}
@@ -36,14 +36,14 @@ button.primary{background:linear-gradient(135deg,#f0f3f9,#9faebc);color:#101924;
 </style>
 </head><body>
 <div id="stage"></div><div id="ui">
- <div id="top"><div class="card" id="brand"><b>TRANSFORMING WORLD</b><small>CARCONCEPT / FLIGHT LAB 10 · REAR WING / WHEEL DOWN</small></div><div class="card" id="meters"><div><span id="spd">0</span> km/h</div><div id="mode">LAND MODE</div><div id="alt">高度 0.0 m</div><div id="roofState">ROOF: CLOSED</div></div></div></div>
+ <div id="top"><div class="card" id="brand"><b>TRANSFORMING WORLD</b><small>CARCONCEPT / FLIGHT LAB 13 · FULL OPEN ROADSTER</small></div><div class="card" id="meters"><div><span id="spd">0</span> km/h</div><div id="mode">LAND MODE</div><div id="alt">高度 0.0 m</div><div id="roofState">ROOF: CLOSED</div></div></div></div>
  <div class="card" id="help"><b>操作説明（切替可能）</b><div>左ホイール　前進 / 後退 / 旋回</div><div>画面ドラッグ　視点回転</div><div>上昇 / 下降　右側の丸ボタン</div><div>右下ホイールは廃止</div><div>F　陸 ⇄ 飛行に変形</div><div><b>T　オープンカー / ルーフ閉</b></div><div>飛行時：格納式ジェット＋伸長リアウィング</div><div>C　カメラ切替</div><div>Space　ブレーキ</div><div>R　初期位置 / H　HUD</div><div>マウスホイール / ピンチ相当　拡大縮小</div></div>
  <div class="card" id="settings"><h3>CAMERA / GRAPHICS</h3><label>マウス視点感度</label><input id="sensitivity" type="range" min="1" max="10" value="4" /><label>画質</label><select id="quality"><option value="auto">自動</option><option value="high">高</option><option value="low">軽量</option></select><label><input id="autoCam" type="checkbox" checked /> 視点をゆっくり中央へ戻す</label></div>
  <div id="bottom"><button class="primary" id="transform" disabled>✦ 変形 F</button><button id="roof" disabled>☀ オープン T</button><button id="camera">◉ 視点 C</button><button id="helpToggle">説明 OFF</button><button id="reset">↺ リセット R</button><button id="hud">HUD H</button></div>
  <div id="mobile"><div class="stick" id="move" aria-label="drive"></div></div>
  <div id="mKeys"><button class="primary" id="mobileTransform">飛行変形</button><button id="mobileRoof">ルーフ開閉 T</button><button id="brake">ブレーキ</button><button id="helpToggleMini">説明 OFF</button></div>
  <div id="altButtons"><button id="up">上昇<br>E</button><button id="down">下降<br>Q</button></div>
- <div id="notice"></div><div class="card" id="loading"><b>精密車両データを読み込み中...</b><p>車体を維持し、後方スライドルーフ・下向き回転タイヤ・伸長リアウィングを追加します。</p></div>
+ <div id="notice"></div><div class="card" id="loading"><b>精密車両データを読み込み中...</b><p>横翼を飛行時に再展開し、タイヤを水平に収納、オープンルーフの動きを滑らかにします。</p></div>
  <div id="badge">MODEL: CarConcept © Eric Chadwick / Darmstadt Graphics Group · CC BY 4.0</div><div id="foot">車両単体の変形・飛行テスト版（地形と街並みは未統合）</div>
  </div><div id="err"></div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -113,10 +113,11 @@ function createAirparts(){
   const rim=new THREE.Mesh(new THREE.TorusGeometry(.18,.038,8,20),wingCarbon);rim.position.z=-.37;jet.add(rim);
   const ring=new THREE.Mesh(new THREE.CircleGeometry(.15,20),blueGlow);ring.position.z=-.385;ring.rotation.y=Math.PI;jet.add(ring);
   const nav=new THREE.Mesh(new THREE.SphereGeometry(.10,10,8),new THREE.MeshBasicMaterial({color:side>0?0x60f0ff:0xff6777}));nav.position.set(3.27,.04,-.5);mirror.add(nav);
-  jet.visible=false;nav.visible=false;mirror.scale.x=side*.20;wingSets.push({hinge,mirror,wing,nav,jet});
+  hinge.visible=false;jet.visible=false;nav.visible=false;mirror.scale.x=side*.03;wingSets.push({hinge,mirror,wing,nav,jet});
  }
 }
 createAirparts();
+// Side wings are folded away in LAND mode and unfold only in FLIGHT mode.
 
 // Spoiler stays physically linked to the deck via two rear-sweeping telescopic struts.
 function makeBeamBetween(beam,a,b){
@@ -276,46 +277,112 @@ function addSideWaveGraphics(){
 }
 
 // Original wheel meshes remain untouched. Rotate four existing wheel assemblies.
+// Rotate complete original wheel assemblies about their ACTUAL centers in car space.
+// GLB wheels each have their own arbitrary transforms; do not rotate their native quaternion.
 const wheelRotators=[];
-const wheelTurnAxis=new THREE.Vector3(0,0,1);
-const wheelDelta=new THREE.Quaternion();
 function setupWheelPivots(){
+ rig.updateMatrixWorld(true);
  for(const name of ['WheelFrontL','WheelFrontR','WheelRearL','WheelRearR']){
   const wheel=model.getObjectByName(name);
   if(!wheel)continue;
-  wheelRotators.push({wheel,base:wheel.quaternion.clone()});
+  wheel.updateWorldMatrix(true,false);
+  const center=rig.worldToLocal(wheel.getWorldPosition(new THREE.Vector3()));
+  const pivot=new THREE.Group();
+  pivot.name='FlightWheelPivot_'+name;
+  pivot.position.copy(center);
+  rig.add(pivot);
+  rig.updateMatrixWorld(true);
+  pivot.attach(wheel); // keeps exact road-mode pose, including all wheel sub-parts
+  const side=center.x>=0?1:-1;
+  wheelRotators.push({pivot,side});
  }
 }
 function updateWheelRotation(airFraction){
- // 90 degrees in aircraft mode; original exact wheel orientation in road mode.
- wheelDelta.setFromAxisAngle(wheelTurnAxis,-airFraction*Math.PI/2);
- for(const t of wheelRotators)t.wheel.quaternion.copy(t.base).premultiply(wheelDelta);
+ const u=smooth(airFraction);
+ for(const t of wheelRotators){
+  // Roll the wheel 90 deg around the CAR longitudinal axis: disc plane becomes
+  // horizontal / parallel to the ground, rather than turning like a steering wheel.
+  t.pivot.rotation.z=t.side*Math.PI*.5*u;
+  t.pivot.position.y-=0; // fixed wheel-center anchor
+ }
 }
 function setupConvertible(){
- // The GLB contains a separate roof mesh. Reparent, but never alter its vertices.
+ // Use original factory roof mesh; do not remodel the body.
  const panel=model.getObjectByName('BodyRoofPanel');
  if(panel){
-  roofCarrier=new THREE.Group();roofCarrier.name='RetractableRoofCarrier';rig.add(roofCarrier);
-  rig.updateMatrixWorld(true);roofCarrier.attach(panel);
+  roofCarrier=new THREE.Group();
+  roofCarrier.name='FullOpenRoadsterRoof';
+  rig.add(roofCarrier);
+  rig.updateMatrixWorld(true);
+  roofCarrier.attach(panel);
+  // Clone the roof's own materials for a clean fade during the last segment.
+  roofCarrier.userData.fade=[];
+  panel.traverse(obj=>{
+   if(!obj.isMesh)return;
+   const original=Array.isArray(obj.material)?obj.material:[obj.material];
+   const copies=original.map(mat=>{
+    const m=mat.clone();
+    m.transparent=true;
+    m.depthWrite=true;
+    m.opacity=mat.opacity??1;
+    roofCarrier.userData.fade.push({mat:m,opacity:m.opacity});
+    return m;
+   });
+   obj.material=Array.isArray(obj.material)?copies:copies[0];
+  });
  }
- const foldWithRoof=['BodyRearwindow','BodyWindowsRearSides','BodyPillars','InteriorPillar','InteriorCage','BodyDoorLWindow','BodyDoorRWindow'];
- roofParts=foldWithRoof.map(name=>({name,mesh:rig.getObjectByName(name)})).filter(r=>!!r.mesh);
+ // Clear the *whole upper cabin*: side windows, back glass, roof pillars,
+ // window gaskets, and roll cage. Keep front windshield for roadster realism.
+ const removable=[
+  'BodyRearwindow','BodyWindowsRearSides','BodyPillars',
+  'InteriorPillar','InteriorCage',
+  'BodyDoorLWindow','BodyDoorRWindow',
+  'BodyDoorLWindowGasket','BodyDoorRWindowGasket'
+ ];
+ roofParts=[];
+ for(const name of removable){
+  const mesh=rig.getObjectByName(name);
+  if(!mesh)continue;
+  const materials=[];
+  mesh.traverse(obj=>{
+   if(!obj.isMesh)return;
+   const arr=Array.isArray(obj.material)?obj.material:[obj.material];
+   const copies=arr.map(material=>{
+    const mat=material.clone();
+    mat.transparent=true;
+    mat.depthWrite=false;
+    const base=material.opacity??1;
+    mat.opacity=base;
+    materials.push({mat,base});
+    return mat;
+   });
+   obj.material=Array.isArray(obj.material)?copies:copies[0];
+  });
+  roofParts.push({mesh,materials});
+ }
  applyRoofAnimation();
 }
 function applyRoofAnimation(){
  const u=smooth(roofOpen);
  if(roofCarrier){
-  // Roadster roof: retract toward the REAR without sinking under the deck.
-  // A small rise and tilt lets it travel backwards above the rear body.
-  roofCarrier.position.set(0,.12*u,-1.03*u);
-  roofCarrier.rotation.x=-.16*u;
-  roofCarrier.visible=true;
+  // Glide to the rear, lift over the rear deck, then visually tuck away.
+  // Avoid a roof slab remaining on the rear body once fully open.
+  roofCarrier.position.set(0,.14*u,-1.76*u);
+  roofCarrier.rotation.x=-.14*u;
+  const disappear=smooth(THREE.MathUtils.clamp((u-.58)/.42,0,1));
+  roofCarrier.visible=disappear<.998;
+  for(const entry of roofCarrier.userData.fade){
+   entry.mat.opacity=entry.opacity*(1-disappear);
+   entry.mat.depthWrite=disappear<.01;
+  }
  }
- for(const r of roofParts){
-  if(r.name==='BodyRearwindow')r.mesh.visible=roofOpen<.68;
-  else if(r.name==='BodyWindowsRearSides')r.mesh.visible=roofOpen<.52;
-  else if(r.name==='BodyPillars'||r.name==='InteriorPillar'||r.name==='InteriorCage')r.mesh.visible=roofOpen<.70;
-  else r.mesh.visible=roofOpen<.56;
+ // Open cabin all the way to the shoulder line, not only the top panel.
+ // Continuous easing eliminates sudden black patches when opening.
+ const upperClear=smooth(THREE.MathUtils.clamp((u-.04)/.84,0,1));
+ for(const part of roofParts){
+  const remaining=1-upperClear;
+  part.mesh.visible=remaining>.003;
+  for(const entry of part.materials)entry.mat.opacity=entry.base*remaining;
  }
 }
 function updateRoofUI(){
@@ -333,7 +400,7 @@ function toggleRoof(){
  if(!ready||transition||pendingFlight||flight>.02){toast('ルーフ切替は陸上モードのみ');return;}
  if(!roofCarrier){toast('ルーフパーツが見つかりません');return;}
  roofTarget=roofTarget>.5?0:1;
- toast(roofTarget?'ルーフを格納 → オープンカーへ':'ルーフを展開 → クーペに戻る');
+ toast(roofTarget?'ルーフとサイド窓を後方格納 → フルオープン':'ルーフを展開 → クーペに戻る');
  updateRoofUI();
 }
 
@@ -435,7 +502,7 @@ function animate(){
  requestAnimationFrame(animate);const dt=Math.min(frameClock.getDelta(),.05);elapsed+=dt;
  if(ready){
   if(roofOpen!==roofTarget){
-   const step=dt/1.85;
+   const step=dt/2.25;
    roofOpen=THREE.MathUtils.clamp(roofOpen+Math.sign(roofTarget-roofOpen)*step,0,1);
    if(Math.abs(roofOpen-roofTarget)<.001)roofOpen=roofTarget;
    applyRoofAnimation();
@@ -445,16 +512,15 @@ function animate(){
   if(!transition&&flight<.01)$('mode').textContent=roofOpen>.92?'LAND · OPEN TOP':'LAND MODE';
   updateRoofUI();
   const wings=smooth((flight-.03)/.97);
-  // Side elements stay compact. The rear wing is the part that extends in flight.
+  // Original flight wings return; fully hidden on the road.
   for(const part of wingSets){
-   const deploy=smooth(wings);
-   part.hinge.visible=true;
-   part.hinge.scale.setScalar(1);
-   part.hinge.rotation.z=(part.hinge.position.x>0?1:-1)*.03;
-   part.hinge.rotation.y=(part.hinge.position.x>0?1:-1)*.12;
-   part.mirror.scale.x=(part.hinge.position.x>0?1:-1)*.20;
-   part.nav.visible=deploy>.10;
-   part.jet.visible=deploy>.12;
+   const u=smooth(THREE.MathUtils.clamp((wings-.04)/.91,0,1));
+   part.hinge.visible=u>.006;
+   part.mirror.scale.x=(part.hinge.position.x>0?1:-1)*Math.max(.015,u);
+   part.hinge.rotation.z=(part.hinge.position.x>0?1:-1)*(.8*(1-u));
+   part.hinge.rotation.y=(part.hinge.position.x>0?1:-1)*(.22*(1-u));
+   part.nav.visible=u>.35;
+   part.jet.visible=u>.25;
   }
   updateWheelRotation(wings);
   thrusters.forEach((t,i)=>{t.visible=wings>.03;t.scale.setScalar(.78+.22*wings+Math.sin(elapsed*34+i)*.025)});
